@@ -82,7 +82,7 @@ Herramientas en Python diseñadas para gestionar tu cuenta de GitHub directament
 2. **Ejecuta el instalador en un solo paso**:
 
    ```bash
-   curl -sL https://raw.githubusercontent.com/CmbRDevMx/Github_Manager_CLI/main/gh-setup.sh | bash
+   curl -sL https://raw.githubusercontent.com/andromux/GH_CLI/gh-setup.sh | bash
    ```
 
 3. **Reinicia Termux o aplica los cambios al shell**:
