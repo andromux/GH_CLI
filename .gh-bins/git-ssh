@@ -1,0 +1,83 @@
+#!/bin/sh
+
+# Colores
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+PINK='\033[1;35m'
+RESET='\033[0m'
+
+# Función para manejar errores
+handle_error() {
+    echo -e "${RED}Error: $1${RESET}" >&2
+    exit 1
+}
+
+echo -e "${GREEN}Configuración de Git en Termux${RESET}"
+
+# Establecer el nombre de usuario de Git
+echo -e "${YELLOW}Introduce tu nombre de usuario de Git:${RESET}"
+read -p "Usuario: " usuario
+if [ -z "$usuario" ]; then
+    handle_error "El nombre de usuario no puede estar vacío."
+fi
+git config --global user.name "$usuario" || handle_error "No se pudo establecer el nombre de usuario."
+
+echo -e "${GREEN}Usuario de Git configurado: ${PINK}$usuario${RESET}"
+
+# Establecer el correo electrónico de Git
+echo -e "${YELLOW}Introduce tu correo electrónico de Git:${RESET}"
+read -p "Correo: " correo
+if [ -z "$correo" ]; then
+    handle_error "El correo electrónico no puede estar vacío."
+fi
+git config --global user.email "$correo" || handle_error "No se pudo establecer el correo electrónico."
+
+echo -e "${GREEN}Correo electrónico de Git configurado: ${PINK}$correo${RESET}"
+
+# Generar clave SSH
+echo -e "${YELLOW}Introduce un identificador para tu clave SSH:${RESET}"
+read -p "Identificador: " clave
+if [ -z "$clave" ]; then
+    handle_error "El identificador de la clave SSH no puede estar vacío."
+fi
+ssh-keygen -t ed25519 -C "$clave" -f ~/.ssh/id_ed25519 || handle_error "No se pudo generar la clave SSH."
+
+# Evaluar el agente SSH
+eval "$(ssh-agent -s)" || handle_error "No se pudo evaluar el agente SSH."
+
+# Añadir clave SSH al agente
+ssh-add ~/.ssh/id_ed25519 || handle_error "No se pudo añadir la clave SSH al agente."
+
+# Mostrar clave pública para añadirla a GitHub
+echo -e "${GREEN}Clave SSH generada con éxito. Aquí está tu clave pública:${RESET}"
+echo ""
+cat ~/.ssh/id_ed25519.pub || handle_error "No se pudo mostrar la clave pública."
+echo ""
+echo ""
+
+
+# Instrucciones
+echo -e "${YELLOW}1. Copia la clave pública mostrada arriba y añádela a tu cuenta de GitHub.${RESET}"
+echo ""
+echo ""
+echo -e "${PINK}\nAhora, sigue estos pasos para clonar un repositorio, modificar y subir archivos a GitHub:${RESET}"
+echo ""
+echo -e "${YELLOW}2. Clona tu repositorio desde GitHub usando SSH. Usa el siguiente comando:${RESET}"
+echo -e "${PINK}   git clone git@github.com:tu_usuario/tu_repositorio.git${RESET}"
+echo ""
+echo -e "${YELLOW}3. Modifica o añade archivos en tu repositorio clonado.${RESET}"
+echo ""
+echo -e "${YELLOW}4. Añade los archivos modificados o añadidos al área de preparación con el siguiente comando:${RESET}"
+echo -e "${PINK}   git add <archivo>  # Si es un archivo específico${RESET}"
+echo ""
+echo -e "${PINK}   git add .  # Si son varios archivos${RESET}"
+echo ""
+echo -e "${YELLOW}5. Realiza un commit de los cambios con un mensaje que describa lo que hiciste:${RESET}"
+echo -e "${PINK}   git commit -m \"tu_mensaje_de_commit\"${RESET}"
+echo ""
+echo -e "${YELLOW}6. Sube los cambios a GitHub usando:${RESET}"
+echo -e "${PINK}   git push origin main${RESET}"
+echo -e "${YELLOW}   Si es la primera vez que subes los cambios, se te pedirá confirmar el uso de tu clave SSH. Escribe 'yes' cuando se te pregunte.${RESET}"
+echo ""
+echo ""
+echo -e "${GREEN}\n¡Tu configuración está completa! Ya puedes gestionar tu repositorio desde Termux.${RESET}"
